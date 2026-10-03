@@ -113,7 +113,7 @@ async function load(){
 }
 async function init(){
  if(!sb)return;
- try{const{data}=await sb.auth.getSession();admin=!!data.session;sb.auth.onAuthStateChange((_e,x)=>{admin=!!x;render()})}catch(e){}
+ try{const{data}=await sb.auth.getSession();admin=!!data.session;sb.auth.onAuthStateChange((_e,x)=>{const a=!!x;if(a!==admin){admin=a;render()}})}catch(e){}
  load();
 }
 async function act(k,d){
