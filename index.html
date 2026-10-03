@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<meta name="author" content="أنس جاسم">
 <title>تقنيات المختبرات الطبية</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -68,6 +69,7 @@ a.dl{text-decoration:none;display:inline-block}.file{flex-wrap:wrap}
 .tb{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
 .tb th{background:var(--soft);color:var(--pri);padding:10px 6px}.tb td{padding:10px 6px;border-top:1px solid var(--line);text-align:center}
 .add select{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit}
+.note{font-size:12.5px;color:var(--mute);text-align:center;margin:28px 0 8px;line-height:1.9}.note a{color:var(--pri)}
 </style>
 </head>
 <body>
@@ -104,7 +106,7 @@ async function load(){
   a.data.forEach(r=>{const y=YEARS.find(x=>x.id==r.year);if(y&&y.courses[r.course])y.courses[r.course].push(r.name)});
   YEARS.forEach(y=>y.open=Object.values(y.courses).some(z=>z.length));
   Object.keys(FILES).forEach(k=>delete FILES[k]);
-  b.data.forEach(r=>{const x=a.data.find(z=>z.id===r.subject_id);if(!x)return;const f=FILES[x.name]=FILES[x.name]||{lec:[],exam:[],sum:[]};
+  b.data.forEach(r=>{const x=a.data.find(z=>z.id===r.subject_id);if(!x)return;const f=FILES[x.name]=FILES[x.name]||{lec:[],prac:[],exam:[],sum:[]};
    f[r.kind].push({id:r.id,t:r.title,p:r.path,u:sb.storage.from(BK).getPublicUrl(r.path).data.publicUrl})});
  }catch(e){msg="تعذر تحميل البيانات"}
  render();
@@ -184,7 +186,8 @@ function calc(){
  o.innerHTML=t;
 }
 document.addEventListener("input",calc);
-const TN={lec:"المحاضرات",exam:"الاختبارات السابقة",sum:"الملخصات"};
+const credit=()=>`<p class="note">تصميم وتطوير: <b>أنس جاسم</b><br><a href="https://t.me/uuxuq" target="_blank" rel="noopener">تلغرام @uuxuq</a></p>`;
+const TN={lec:"المحاضرات النظرية",prac:"المحاضرات العملية",exam:"الاختبارات السابقة",sum:"الملخصات"};
 const schForm=()=>admin?`<div class="add"><b>إضافة سطر إلى جدول ${S.sk==="theory"?"النظري":"العملي"}</b><input id="gp" placeholder="الكروب (مثال: A)"><select id="dy">${DAYS.map(x=>`<option>${x}</option>`).join("")}</select><input id="tm" placeholder="الوقت (مثال: 9:00 – 12:00)"><input id="sj" placeholder="المادة"><input id="pl" placeholder="القاعة أو المختبر"><input id="lc" placeholder="المدرّس (اختياري)"><button class="dl" data-act="addrow">إضافة</button></div>`:"";
 const addSubForm=()=>admin?`<div class="add"><input id="sn" placeholder="اسم المادة الجديدة"><button class="dl" data-act="addsub">إضافة مادة</button></div>`:"";
 const upForm=()=>admin?`<div class="add"><b>رفع ملف إلى ${TN[S.tab]}</b><input id="ft" placeholder="اسم الملف (مثال: المحاضرة 3)"><input id="fl" type="file"><button class="dl" data-act="upload">رفع</button></div>`:"";
@@ -206,15 +209,15 @@ function render(){
  if(S.v==="home"){
   const y=yr();
   app.innerHTML=`<div class="top"><button class="ic p" aria-label="الملف الشخصي">👤</button><div class="mid"><b>تقنيات المختبرات الطبية</b><small>جامعة المعارف</small></div><button class="ic" data-nav="notif" aria-label="الإشعارات">🔔</button></div>
-  <div class="banner"><i>🔬</i><b>كل ما يخص دراستك في مكان واحد</b><span>محاضرات واختبارات وملخصات</span></div>
+  <div class="banner" role="img" aria-label="تقنيات المختبرات الطبية" style="background:url(banner.jpg) center 40%/cover no-repeat;height:170px"></div>
   <div class="h"><b>اختر الكورس</b><div class="chips">${YEARS.map(x=>`<button class="chip" ${x.open||admin?"":"disabled"} aria-pressed="${x.id==S.y}" data-year="${x.id}">${x.name}</button>`).join("")}</div></div>
   <div class="two">${Object.entries(y.courses).map(([c,m])=>`<button class="course" data-course="${esc(c)}"><div class="badge">📘</div><b>${esc(c)}</b><span>${m.length} مواد دراسية</span><div class="go">‹</div></button>`).join("")}</div>
   <div class="h"><b>أقسام أخرى</b></div>
-  <div class="four"><button class="sec" data-nav="sched"><i>📅</i>الجداول</button><button class="sec" data-kd="exam"><i>📝</i>الاختبارات السابقة</button><button class="sec" data-kd="sum"><i>📄</i>الملخصات</button><button class="sec" data-nav="q"><i>💬</i>استفسارات الطلبة</button><button class="sec" data-nav="calc"><i>🧮</i>حاسبة المختبر</button><button class="sec" data-nav="notif"><i>📢</i>تبليغات الجامعة</button><button class="sec" data-nav="ref" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:10px"><i style="margin:0">🩸</i>القيم الطبيعية للفحوصات</button></div>`;
+  <div class="four"><button class="sec" data-nav="sched"><i>📅</i>الجداول</button><button class="sec" data-kd="exam"><i>📝</i>الاختبارات السابقة</button><button class="sec" data-kd="sum"><i>📄</i>الملخصات</button><button class="sec" data-nav="q"><i>💬</i>استفسارات الطلبة</button><button class="sec" data-nav="calc"><i>🧮</i>حاسبة المختبر</button><button class="sec" data-nav="notif"><i>📢</i>تبليغات الجامعة</button><button class="sec" data-nav="ref" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:10px"><i style="margin:0">🩸</i>القيم الطبيعية للفحوصات</button></div>${credit()}`;
  }
  else if(S.v==="course"){app.innerHTML=bar(S.c+" · "+yr().name,"home")+addSubForm()+`<div class="list">${yr().courses[S.c].map(m=>subRow({y:S.y,yn:yr().name,c:S.c,m})).join("")}</div>`}
  else if(S.v==="sub"){
-  const f=FILES[S.s]||{},l=f[S.tab]||[],T=[["lec","المحاضرات"],["exam","الاختبارات السابقة"],["sum","الملخصات"]];
+  const f=FILES[S.s]||{},l=f[S.tab]||[],T=[["lec","المحاضرات النظرية"],["prac","المحاضرات العملية"],["exam","الاختبارات السابقة"],["sum","الملخصات"]];
   app.innerHTML=bar(S.s,S.from)+`<div class="tabs" role="tablist">${T.map(([k,n])=>`<button class="tab" role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${n}</button>`).join("")}</div>`+(l.length?`<div class="list">${l.map(i=>`<div class="file"><b>${esc(i.t)}</b>${fb(i)}</div>`).join("")}</div>`:`<div class="empty">لا توجد ملفات هنا بعد.<br>سيتم رفعها قريبًا.</div>`)+upForm();mark();
  }
  else if(S.v==="fav"){const a=subs().filter(x=>fav.includes(x.m));app.innerHTML=bar("المفضلة","home")+(a.length?`<div class="list">${a.map(subRow).join("")}</div>`:`<div class="empty">ما أضفت مواد للمفضلة.<br>اضغط ☆ بجانب أي مادة.</div>`)}
@@ -248,7 +251,7 @@ function render(){
   app.innerHTML=bar("حاسبة المختبر","home")+`<div class="chips" style="margin-bottom:12px">${Object.keys(CALCN).map(k=>`<button class="chip" aria-pressed="${k===c}" data-cc="${k}">${CALCN[k]}</button>`).join("")}</div><div class="add"><small style="color:var(--mute);line-height:1.7">${CALCH[c]}</small>`+(c==="conv"?`<select id="cs">${CONV.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join("")}</select><select id="cd"><option value="0">من الوحدة التقليدية إلى SI</option><option value="1">من SI إلى التقليدية</option></select>`:"")+CALCF[c].map(([id,l])=>`<label dir="auto" style="display:grid;gap:4px;font-size:13px">${l}<input id="${id}" type="number" inputmode="decimal" step="any" dir="ltr"></label>`).join("")+`</div><div class="empty" id="cr" dir="auto" style="line-height:2;font-size:17px;color:var(--ink)"></div>`;
   calc();
  }
- else if(S.v==="more"){app.innerHTML=bar("المزيد","home")+`${adminBox()}`}
+ else if(S.v==="more"){app.innerHTML=bar("المزيد","home")+`${adminBox()}${credit()}`}
 }
 document.addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;const d=b.dataset;
