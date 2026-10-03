@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5a3de0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>تقنيات المختبرات الطبية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4fc;--card:#fff;--ink:#1d1740;--mute:#767191;--pri:#5a3de0;--pri2:#8466f5;--acc:#0fa58a;--line:#e6e2f6;--soft:#efeafd;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12102a;--card:#1c1940;--ink:#efecff;--mute:#a29dc7;--pri:#9480ff;--pri2:#6c4cf0;--acc:#2fd0b0;--line:#2e2a5c;--soft:#27235a}}
+:root[data-theme="dark"]{--bg:#12102a;--card:#1c1940;--ink:#efecff;--mute:#a29dc7;--pri:#9480ff;--pri2:#6c4cf0;--acc:#2fd0b0;--line:#2e2a5c;--soft:#27235a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",Tahoma,sans-serif}
+#app{max-width:480px;margin:0 auto;padding:14px 16px calc(110px + env(safe-area-inset-bottom,0px))}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.top .mid{text-align:center}.top b{font-size:17px;display:block}.top small{color:var(--mute);font-size:12px}
+.ic{width:42px;height:42px;border-radius:50%;border:0;display:grid;place-items:center;font-size:18px;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.ic.p{background:var(--pri);color:#fff}
+.banner{height:150px;border-radius:20px;background:linear-gradient(135deg,var(--pri),var(--pri2) 60%,#4b8bf5);color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}
+.banner b{font-size:20px;font-weight:800}.banner span{font-size:13px;opacity:.9}
+.banner i{position:absolute;left:14px;top:8px;font-size:64px;font-style:normal;opacity:.9}
+.h{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px}
+.h b{font-size:17px}
+.chips{display:flex;gap:6px;overflow-x:auto}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff}
+.chip:disabled{opacity:.45}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.course{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 12px;text-align:center;font:inherit;color:inherit;cursor:pointer}
+.badge{width:52px;height:52px;border-radius:50%;background:var(--soft);display:grid;place-items:center;margin:0 auto 10px;font-size:22px}
+.course b{display:block;color:var(--pri);font-size:17px}.course span{font-size:12.5px;color:var(--mute)}
+.go{margin:10px auto 0;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--pri);color:var(--pri);display:grid;place-items:center}
+.four{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sh{font-weight:700;color:var(--pri);margin:16px 0 8px}
+.add textarea{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit;width:100%;resize:vertical}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 4px;text-align:center;font:inherit;color:inherit;cursor:pointer;font-size:12px;font-weight:700;line-height:1.35}
+.sec i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;margin:0 auto 6px;font-style:normal;font-size:16px;background:var(--soft)}
+.sec.off{opacity:.6}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px))}
+nav div{max-width:480px;margin:0 auto;display:flex;justify-content:space-around;align-items:flex-end}
+nav button{border:0;background:none;color:var(--mute);font:inherit;font-size:11.5px;display:grid;gap:2px;justify-items:center;cursor:pointer;min-width:56px}
+nav button span{font-size:20px}
+nav button[aria-current="page"]{color:var(--pri);font-weight:700}
+nav .home span{background:var(--pri);color:#fff;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;margin-top:-26px;box-shadow:0 4px 12px rgba(90,61,224,.4)}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}.bar h2{margin:0;font-size:19px}
+.back{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 14px;font:inherit;cursor:pointer}
+.list{display:flex;flex-direction:column;gap:10px}
+.row,.file{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;width:100%;text-align:right;font:inherit;color:inherit}
+.row{cursor:pointer}.row b,.file b{font-size:15.5px}.row small{color:var(--mute);display:block}
+.star{border:0;background:none;font-size:22px;cursor:pointer;color:var(--mute)}.star.on{color:#f5a623}
+.tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto}
+.tab{flex:1;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:700}
+.dl{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
+.empty{border:1px dashed var(--line);border-radius:16px;padding:26px 16px;text-align:center;color:var(--mute);line-height:1.8}
+.search{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:12px 14px;font:inherit;margin-bottom:12px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.add{display:grid;gap:8px;background:var(--card);border:1px dashed var(--pri);border-radius:14px;padding:12px;margin:12px 0}
+.add input{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit;width:100%}
+a.dl{text-decoration:none;display:inline-block}.file{flex-wrap:wrap}
+.tb{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
+.tb th{background:var(--soft);color:var(--pri);padding:10px 6px}.tb td{padding:10px 6px;border-top:1px solid var(--line);text-align:center}
+.add select{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav><div id="nav"></div></nav>
+<script>
+/* ===== بيانات التطبيق: حدّثها كل سنة =====
+   سنة جديدة: غيّر open إلى true وأضف موادها. ملف جديد: أضفه في FILES بالشكل {t:"الاسم",u:"الرابط"} */
+const YEARS=[
+ {id:1,name:"السنة الأولى",open:true,courses:{"الكورس الأول":["علم التشريح","الكيمياء العامة","اللغة الإنكليزية","حقوق الإنسان"],"الكورس الثاني":["علم وظائف الأعضاء","الكيمياء الحياتية","علم الأحياء","الحاسوب"]}},
+ {id:2,name:"السنة الثانية",open:true,courses:{"الكورس الأول":["Human Physiology 1","Histology 1","Medical Bacteriology 1","Medical Parasitology 1","Biochemistry 1","Descriptive Biostatistics","Crimes of Baath","Arabic Language"],"الكورس الثاني":[]}},
+ {id:3,name:"السنة الثالثة",open:false,courses:{}},
+ {id:4,name:"السنة الرابعة",open:false,courses:{}}
+];
+const FILES={"Human Physiology 1":{lec:[{t:"المحاضرة 1 (مثال)",u:"#"},{t:"المحاضرة 2 (مثال)",u:"#"}],exam:[{t:"اختبار الكورس الأول (نموذج)",u:"#"}],sum:[]}};
+const ANN=[{t:"مثال: موعد الامتحانات النصفية",d:"سيُعلن هنا"},{t:"مثال: تعطيل الدوام الرسمي",d:"سيُعلن هنا"}];
+/* ======================================= */
+const app=document.getElementById("app"),nav=document.getElementById("nav");
+const CFG={url:"https://omewadabnsoohunnfttd.supabase.co",key:"sb_publishable_Xxp1GY0ZwZQoqty-jGamWA_R82aQ6iu"}; /* ضع رابط مشروع Supabase والمفتاح العام (anon) هنا */
+if(CFG.url){Object.keys(FILES).forEach(k=>delete FILES[k]);ANN.length=0}
+const BK="materials",CN=["الكورس الأول","الكورس الثاني"];
+let sb=null,admin=false,msg="",ROWS=[];
+const DAYS=["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
+const SLOTS=["8:30-10:00", "10:00-11:30", "11:30-1:00", "1:00-2:30"];
+let SCHED=CFG.url?[]:[{"id":0,"year":2,"kind":"theory","grp":"A","day":"السبت","time":"1:00-2:30","subj":"Histology 1","lect":"م.م. بلال عبد المجيد","place":"M-115"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"السبت","time":"8:30-10:00","subj":"Human Physiology 1","lect":"أ.د. عبد علي ذاكر","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"السبت","time":"11:30-1:00","subj":"Histology 1","lect":"م.م. بلال عبد المجيد","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الأحد","time":"8:30-10:00","subj":"Medical Bacteriology 1","lect":"م.د. محمد جمال منصور","place":"M-114"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الأحد","time":"10:00-11:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-114"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الأحد","time":"11:30-1:00","subj":"Human Physiology 1","lect":"أ.د. عبد علي ذاكر","place":"M-114"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الأحد","time":"1:00-2:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-114"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الثلاثاء","time":"8:30-10:00","subj":"Medical Parasitology 1","lect":"م.م. محمود ياسين مخلف","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الثلاثاء","time":"10:00-11:30","subj":"Medical Parasitology 1","lect":"م.م. محمود ياسين مخلف","place":"B-102"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الثلاثاء","time":"11:30-1:00","subj":"Medical Bacteriology 1","lect":"م.د. محمد جمال منصور","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الأربعاء","time":"8:30-10:00","subj":"Descriptive Biostatistics","lect":"أ.د. حمدي جاسم حمادي","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الأربعاء","time":"11:30-1:00","subj":"Descriptive Biostatistics","lect":"أ.د. حمدي جاسم حمادي","place":"M-214"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الاثنين","time":"10:00-11:30","subj":"Crimes of Baath","lect":"","place":"أونلاين"},{"id":0,"year":2,"kind":"theory","grp":"A","day":"الاثنين","time":"11:30-1:00","subj":"Arabic Language","lect":"","place":"أونلاين"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الاثنين","time":"10:00-11:30","subj":"Crimes of Baath","lect":"","place":"أونلاين"},{"id":0,"year":2,"kind":"theory","grp":"B","day":"الاثنين","time":"11:30-1:00","subj":"Arabic Language","lect":"","place":"أونلاين"},{"id":0,"year":2,"kind":"practical","grp":"B2","day":"السبت","time":"8:30-10:00","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B3","day":"السبت","time":"8:30-10:00","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B1","day":"السبت","time":"8:30-10:00","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"A4","day":"السبت","time":"10:00-11:30","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A1","day":"السبت","time":"10:00-11:30","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A2","day":"السبت","time":"10:00-11:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"A2","day":"السبت","time":"11:30-1:00","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A4","day":"السبت","time":"11:30-1:00","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A3","day":"السبت","time":"11:30-1:00","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"B3","day":"السبت","time":"1:00-2:30","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B1","day":"السبت","time":"1:00-2:30","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B4","day":"السبت","time":"1:00-2:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"B1","day":"الأحد","time":"8:30-10:00","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B2","day":"الأحد","time":"8:30-10:00","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A3","day":"الأحد","time":"10:00-11:30","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A2","day":"الأحد","time":"10:00-11:30","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A1","day":"الأحد","time":"11:30-1:00","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A4","day":"الأحد","time":"11:30-1:00","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B4","day":"الأحد","time":"1:00-2:30","subj":"Medical Bacteriology 1","lect":"م.م. محمود ياسين مخلف","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B3","day":"الأحد","time":"1:00-2:30","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A4","day":"الثلاثاء","time":"8:30-10:00","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A3","day":"الثلاثاء","time":"8:30-10:00","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B4","day":"الثلاثاء","time":"10:00-11:30","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B1","day":"الثلاثاء","time":"10:00-11:30","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A2","day":"الثلاثاء","time":"11:30-1:00","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A1","day":"الثلاثاء","time":"11:30-1:00","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A1","day":"الثلاثاء","time":"1:00-2:30","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B4","day":"الثلاثاء","time":"1:00-2:30","subj":"Histology 1","lect":"م.م. بلال عبد المجيد مخلف","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B1","day":"الأربعاء","time":"8:30-10:00","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B2","day":"الأربعاء","time":"8:30-10:00","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B3","day":"الأربعاء","time":"8:30-10:00","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"B3","day":"الأربعاء","time":"10:00-11:30","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"B4","day":"الأربعاء","time":"10:00-11:30","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"B2","day":"الأربعاء","time":"10:00-11:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"A3","day":"الأربعاء","time":"11:30-1:00","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A2","day":"الأربعاء","time":"11:30-1:00","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A1","day":"الأربعاء","time":"11:30-1:00","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"},{"id":0,"year":2,"kind":"practical","grp":"B2","day":"الأربعاء","time":"1:00-2:30","subj":"Medical Parasitology 1","lect":"م.م. سمية ناظم محمد","place":"M-002"},{"id":0,"year":2,"kind":"practical","grp":"A3","day":"الأربعاء","time":"1:00-2:30","subj":"Human Physiology 1","lect":"م.م. ايمان رعيد عزام","place":"M-003"},{"id":0,"year":2,"kind":"practical","grp":"A4","day":"الأربعاء","time":"1:00-2:30","subj":"Biochemistry 1","lect":"م.م. محمد هاشم محمد","place":"M-104"}];
+try{if(CFG.url&&CFG.key&&window.supabase)sb=window.supabase.createClient(CFG.url,CFG.key)}catch(e){}
+async function load(){
+ if(!sb)return;
+ try{
+  const a=await sb.from("subjects").select("*").order("name"),b=await sb.from("files").select("*").order("created_at");
+  if(a.error||b.error)throw 0;
+  ROWS=a.data;const c=await sb.from("schedule").select("*").order("id");SCHED=c.error?[]:c.data;
+  YEARS.forEach(y=>{y.courses={};CN.forEach(c=>y.courses[c]=[])});
+  a.data.forEach(r=>{const y=YEARS.find(x=>x.id==r.year);if(y&&y.courses[r.course])y.courses[r.course].push(r.name)});
+  YEARS.forEach(y=>y.open=Object.values(y.courses).some(z=>z.length));
+  Object.keys(FILES).forEach(k=>delete FILES[k]);
+  b.data.forEach(r=>{const x=a.data.find(z=>z.id===r.subject_id);if(!x)return;const f=FILES[x.name]=FILES[x.name]||{lec:[],exam:[],sum:[]};
+   f[r.kind].push({id:r.id,t:r.title,p:r.path,u:sb.storage.from(BK).getPublicUrl(r.path).data.publicUrl})});
+ }catch(e){msg="تعذر تحميل البيانات"}
+ render();
+}
+async function init(){
+ if(!sb)return;
+ try{const{data}=await sb.auth.getSession();admin=!!data.session;sb.auth.onAuthStateChange((_e,x)=>{admin=!!x;render()})}catch(e){}
+ load();
+}
+async function act(k,d){
+ const v=id=>(document.getElementById(id)||{}).value||"";
+ try{
+  if(k==="open"){const w=window.open("","_blank");try{const c=await caches.open("maarif-files");let r=await c.match(d.url);if(!r){r=await fetch(d.url);if(!r.ok)throw 0;await c.put(d.url,r.clone())}const b=await r.blob(),u=URL.createObjectURL(b);if(w)w.location=u;else location.href=u;mark()}catch(e){if(w)w.location=d.url;else location.href=d.url}}
+  else if(k==="login"){const r=await sb.auth.signInWithPassword({email:v("em"),password:v("pw")});msg=r.error?"بيانات الدخول غير صحيحة":"";render()}
+  else if(k==="logout"){await sb.auth.signOut()}
+  else if(k==="ask"){const b=v("qb").trim();if(b.length<3){alert("اكتب سؤالك أولًا");return}const r=await sb.from("inquiries").insert({name:v("qn").trim()||null,body:b});if(r.error)throw r.error;await loadQ()}
+  else if(k==="reply"){const b=v("r"+d.id).trim();if(!b)return;const r=await sb.from("replies").insert({inquiry_id:+d.id,name:v("qn").trim()||null,body:b,is_admin:admin});if(r.error)throw r.error;await loadQ()}
+  else if(k==="delq"||k==="delr"){if(!confirm("حذف؟"))return;await sb.from(k==="delq"?"inquiries":"replies").delete().eq("id",d.id);await loadQ()}
+  else if(k==="askai"){const t=v("aq").trim();if(!t||busy)return;CH.push({role:"user",text:t});busy=true;render();
+   try{const r=await fetch(CFG.url+"/functions/v1/ask",{method:"POST",headers:{"Content-Type":"application/json",apikey:CFG.key,Authorization:"Bearer "+CFG.key},body:JSON.stringify({messages:CH})});const j=await r.json();CH.push({role:"ai",text:j.reply||"تعذر الرد الآن، حاول بعد قليل."})}catch(e){CH.push({role:"ai",text:"تحتاج اتصالًا بالإنترنت."})}
+   busy=false;render();window.scrollTo(0,document.body.scrollHeight)}
+  else if(k==="delsub"){const x=ROWS.find(r=>r.name===d.name);if(!x||!confirm("حذف المادة وكل ملفاتها نهائيًا؟"))return;const f=FILES[x.name]||{},ps=[...(f.lec||[]),...(f.exam||[]),...(f.sum||[])].map(i=>i.p).filter(Boolean);if(ps.length)await sb.storage.from(BK).remove(ps);await sb.from("subjects").delete().eq("id",x.id);await load()}
+  else if(k==="addrow"){const g=v("gp").trim().toUpperCase(),tm=v("tm").trim(),sj=v("sj").trim();if(!g||!tm||!sj){alert("اكتب الكروب والوقت والمادة");return}
+   const r=await sb.from("schedule").insert({year:+S.y,kind:S.sk,grp:g,day:v("dy"),time:tm,subj:sj,place:v("pl").trim(),lect:v("lc").trim()});if(r.error)throw r.error;S.sg=g;await load()}
+  else if(k==="delrow"){if(!confirm("حذف هذا السطر؟"))return;await sb.from("schedule").delete().eq("id",d.id);await load()}
+  else if(k==="addsub"){const n=v("sn").trim();if(!n)return;const r=await sb.from("subjects").insert({year:+S.y,course:S.c,name:n});if(r.error)throw r.error;await load()}
+  else if(k==="upload"){
+   const f=((document.getElementById("fl")||{}).files||[])[0];if(!f){alert("اختر ملفًا أولًا");return}
+   const t=v("ft").trim()||f.name,s=ROWS.find(x=>x.name===S.s),ext=(f.name.split(".").pop()||"bin").replace(/[^a-z0-9]/gi,""),p=s.id+"/"+Date.now()+"."+ext;
+   const u=await sb.storage.from(BK).upload(p,f,{contentType:f.type||"application/octet-stream"});if(u.error)throw u.error;
+   const r=await sb.from("files").insert({subject_id:s.id,kind:S.tab,title:t,path:p});if(r.error)throw r.error;await load()}
+  else if(k==="delfile"){if(!confirm("حذف الملف نهائيًا؟"))return;await sb.storage.from(BK).remove([d.path]);await sb.from("files").delete().eq("id",d.id);await load()}
+ }catch(e){alert("حدث خطأ. تأكد من الإنترنت ومن صلاحيات المشرف.")}
+}
+async function mark(){try{const c=await caches.open("maarif-files");document.querySelectorAll("[data-url]").forEach(async b=>{if(await c.match(b.dataset.url))b.textContent="فتح ✓"})}catch(e){}}
+let QS=[],CH=[],busy=false;
+async function loadQ(){if(!sb)return;try{const r=await sb.from("inquiries").select("*,replies(*)").order("created_at",{ascending:false}).limit(50);if(r.error)throw r.error;QS=r.data}catch(e){}render()}
+const REF=[
+["Hematology – CBC","WBC","4.0–11.0","×10³/µL"],["Hematology – CBC","RBC","M 4.5–5.9 · F 4.1–5.1","×10⁶/µL"],["Hematology – CBC","Hemoglobin (Hb)","M 13.5–17.5 · F 12.0–15.5","g/dL"],["Hematology – CBC","Hematocrit (PCV)","M 41–53 · F 36–46","%"],["Hematology – CBC","MCV","80–100","fL"],["Hematology – CBC","MCH","27–33","pg"],["Hematology – CBC","MCHC","32–36","g/dL"],["Hematology – CBC","RDW","11.5–14.5","%"],["Hematology – CBC","Platelets","150–450","×10³/µL"],["Hematology – CBC","Reticulocytes","0.5–2.5","%"],["Hematology – CBC","ESR (Westergren)","M up to 15 · F up to 20","mm/hr"],
+["WBC Differential","Neutrophils","40–70","%"],["WBC Differential","Lymphocytes","20–40","%"],["WBC Differential","Monocytes","2–8","%"],["WBC Differential","Eosinophils","1–4","%"],["WBC Differential","Basophils","0–1","%"],
+["Coagulation","PT","11–13.5","sec"],["Coagulation","INR","0.8–1.1","—"],["Coagulation","aPTT","25–35","sec"],["Coagulation","Fibrinogen","200–400","mg/dL"],
+["Glucose & Kidney","Fasting glucose","70–99","mg/dL"],["Glucose & Kidney","HbA1c","below 5.7","%"],["Glucose & Kidney","BUN","7–20","mg/dL"],["Glucose & Kidney","Creatinine","M 0.7–1.3 · F 0.6–1.1","mg/dL"],["Glucose & Kidney","Uric acid","M 3.4–7.0 · F 2.4–6.0","mg/dL"],
+["Electrolytes & Minerals","Sodium (Na)","135–145","mmol/L"],["Electrolytes & Minerals","Potassium (K)","3.5–5.0","mmol/L"],["Electrolytes & Minerals","Chloride (Cl)","98–107","mmol/L"],["Electrolytes & Minerals","Bicarbonate (HCO3)","22–29","mmol/L"],["Electrolytes & Minerals","Calcium (total)","8.5–10.5","mg/dL"],["Electrolytes & Minerals","Phosphate","2.5–4.5","mg/dL"],["Electrolytes & Minerals","Magnesium","1.7–2.2","mg/dL"],
+["Liver Function","ALT (SGPT)","up to 40","U/L"],["Liver Function","AST (SGOT)","up to 40","U/L"],["Liver Function","ALP","44–147","U/L"],["Liver Function","GGT","M 8–61 · F 5–36","U/L"],["Liver Function","Total bilirubin","0.1–1.2","mg/dL"],["Liver Function","Direct bilirubin","0–0.3","mg/dL"],["Liver Function","Total protein","6.0–8.3","g/dL"],["Liver Function","Albumin","3.5–5.0","g/dL"],
+["Lipid Profile","Total cholesterol","below 200","mg/dL"],["Lipid Profile","LDL","below 100","mg/dL"],["Lipid Profile","HDL","M above 40 · F above 50","mg/dL"],["Lipid Profile","Triglycerides","below 150","mg/dL"],
+["Iron, Thyroid & Others","Serum iron","M 65–175 · F 50–170","µg/dL"],["Iron, Thyroid & Others","Ferritin","M 24–336 · F 11–307","ng/mL"],["Iron, Thyroid & Others","TIBC","250–450","µg/dL"],["Iron, Thyroid & Others","CRP","below 5","mg/L"],["Iron, Thyroid & Others","TSH","0.4–4.0","mIU/L"],["Iron, Thyroid & Others","Free T4","0.8–1.8","ng/dL"],
+["Urine (General Exam)","Specific gravity","1.005–1.030","—"],["Urine (General Exam)","pH","4.5–8.0","—"],["Urine (General Exam)","Protein / Glucose / Ketones","Negative","—"],["Urine (General Exam)","WBC","0–5","/HPF"],["Urine (General Exam)","RBC","0–2","/HPF"],
+["Arterial Blood Gas","pH","7.35–7.45","—"],["Arterial Blood Gas","PaCO2","35–45","mmHg"],["Arterial Blood Gas","PaO2","80–100","mmHg"],["Arterial Blood Gas","HCO3","22–26","mmol/L"]
+].map(a=>({g:a[0],t:a[1],v:a[2],u:a[3]}));
+const fmt=v=>isFinite(v)?String(+v.toPrecision(5)):"—";
+const CONV=[["Glucose","mg/dL","mmol/L",0.0555],["Cholesterol","mg/dL","mmol/L",0.02586],["Triglycerides","mg/dL","mmol/L",0.01129],["Creatinine","mg/dL","µmol/L",88.4],["Urea (BUN)","mg/dL","mmol/L",0.357],["Uric acid","mg/dL","µmol/L",59.48],["Calcium","mg/dL","mmol/L",0.2495],["Bilirubin","mg/dL","µmol/L",17.1],["Hemoglobin","g/dL","g/L",10]];
+const CALCN={dil:"التخفيف",mol:"المولارية",pct:"نسبة مئوية",conv:"تحويل الوحدات",idx:"مؤشرات الكريات",cnt:"عدّ الخلايا"};
+const CALCH={dil:"C1×V1 = C2×V2. اترك خانة واحدة فارغة وتنحسب. لازم الوحدات تتطابق.",mol:"الكتلة = المولارية × الحجم (لتر) × MW. اترك خانة واحدة فارغة.",pct:"w/v %: عدد الغرامات في 100 mL. اترك خانة واحدة فارغة.",conv:"اختر الفحص واكتب القيمة والاتجاه.",idx:"تحسب MCV و MCH و MCHC من نتائج CBC.",cnt:"الخلايا/µL = العدد × التخفيف ÷ (المساحة × 0.1). مثال: WBC بـ 4 مربعات كبيرة = 4 mm²، و RBC بـ 5 مربعات صغيرة = 0.2 mm²."};
+const CALCF={dil:[["c1","C1 — التركيز الابتدائي"],["v1","V1 — الحجم الابتدائي"],["c2","C2 — التركيز النهائي"],["v2","V2 — الحجم النهائي"]],mol:[["mw","الوزن الجزيئي MW (g/mol)"],["m","المولارية (mol/L)"],["v","الحجم (mL)"],["w","الكتلة (g)"]],pct:[["p","النسبة % (w/v)"],["v","الحجم (mL)"],["w","الكتلة (g)"]],conv:[["cv","القيمة"]],idx:[["hct","Hematocrit (%)"],["hb","Hemoglobin (g/dL)"],["rbc","RBC (×10⁶/µL)"]],cnt:[["n","عدد الخلايا المعدودة"],["a","المساحة المعدودة (mm²)"],["d","معامل التخفيف (Dilution factor)"]]};
+function calc(){
+ if(S.v!=="calc")return;const o=document.getElementById("cr");if(!o)return;
+ const g=id=>parseFloat((document.getElementById(id)||{}).value),c=S.cc||"dil";let t="";
+ const empty=x=>Object.keys(x).filter(k=>isNaN(x[k]));
+ if(c==="dil"){const x={c1:g("c1"),v1:g("v1"),c2:g("c2"),v2:g("v2")},e=empty(x);
+  if(e.length!==1)t="اترك خانة واحدة فقط فارغة وتنحسب لك";
+  else{const k=e[0],r={c1:x.c2*x.v2/x.v1,v1:x.c2*x.v2/x.c1,c2:x.c1*x.v1/x.v2,v2:x.c1*x.v1/x.c2}[k];x[k]=r;t=`${k.toUpperCase()} = <b>${fmt(r)}</b>`+(x.v2>x.v1?`<br><small>حجم المذيب = V2 − V1 = <b>${fmt(x.v2-x.v1)}</b></small>`:"")}}
+ else if(c==="mol"){const x={mw:g("mw"),m:g("m"),v:g("v"),w:g("w")},e=empty(x);
+  if(e.length!==1)t="اترك خانة واحدة فقط فارغة";
+  else{const k=e[0],r={w:x.m*x.v/1000*x.mw,m:x.w/x.mw/(x.v/1000),v:x.w/(x.mw*x.m)*1000,mw:x.w/(x.m*x.v/1000)}[k];t=`${{w:"الكتلة (g)",m:"المولارية (mol/L)",v:"الحجم (mL)",mw:"MW (g/mol)"}[k]} = <b>${fmt(r)}</b>`}}
+ else if(c==="pct"){const x={p:g("p"),v:g("v"),w:g("w")},e=empty(x);
+  if(e.length!==1)t="اترك خانة واحدة فقط فارغة";
+  else{const k=e[0],r={w:x.p*x.v/100,p:x.w*100/x.v,v:x.w*100/x.p}[k];t=`${{w:"الكتلة (g)",p:"النسبة (%)",v:"الحجم (mL)"}[k]} = <b>${fmt(r)}</b>`}}
+ else if(c==="conv"){const f=CONV[+document.getElementById("cs").value],d=document.getElementById("cd").value==="1",v=g("cv");
+  t=isNaN(v)?"اكتب القيمة":`${fmt(d?v/f[3]:v*f[3])} <b>${d?f[1]:f[2]}</b>`}
+ else if(c==="idx"){const h=g("hct"),b=g("hb"),r=g("rbc"),a=[];
+  if(h>0&&r>0)a.push(`MCV = <b>${fmt(h*10/r)}</b> fL <small>(80–100)</small>`);
+  if(b>0&&r>0)a.push(`MCH = <b>${fmt(b*10/r)}</b> pg <small>(27–33)</small>`);
+  if(b>0&&h>0)a.push(`MCHC = <b>${fmt(b*100/h)}</b> g/dL <small>(32–36)</small>`);
+  t=a.join("<br>")||"اكتب Hct و Hb و RBC"}
+ else if(c==="cnt"){const n=g("n"),a=g("a"),d=g("d"),r=n*d/(a*0.1);
+  t=r>0&&isFinite(r)?`<b>${fmt(r)}</b> cells/µL<br><small>= ${fmt(r/1000)} ×10³/µL</small>`:"اكتب كل القيم"}
+ o.innerHTML=t;
+}
+document.addEventListener("input",calc);
+const TN={lec:"المحاضرات",exam:"الاختبارات السابقة",sum:"الملخصات"};
+const schForm=()=>admin?`<div class="add"><b>إضافة سطر إلى جدول ${S.sk==="theory"?"النظري":"العملي"}</b><input id="gp" placeholder="الكروب (مثال: A)"><select id="dy">${DAYS.map(x=>`<option>${x}</option>`).join("")}</select><input id="tm" placeholder="الوقت (مثال: 9:00 – 12:00)"><input id="sj" placeholder="المادة"><input id="pl" placeholder="القاعة أو المختبر"><input id="lc" placeholder="المدرّس (اختياري)"><button class="dl" data-act="addrow">إضافة</button></div>`:"";
+const addSubForm=()=>admin?`<div class="add"><input id="sn" placeholder="اسم المادة الجديدة"><button class="dl" data-act="addsub">إضافة مادة</button></div>`:"";
+const upForm=()=>admin?`<div class="add"><b>رفع ملف إلى ${TN[S.tab]}</b><input id="ft" placeholder="اسم الملف (مثال: المحاضرة 3)"><input id="fl" type="file"><button class="dl" data-act="upload">رفع</button></div>`:"";
+const fb=i=>(i.u&&i.u!=="#"?`<button class="dl" data-act="open" data-url="${esc(i.u)}">تحميل</button>`:`<button class="dl">تحميل</button>`)+(admin&&i.id?`<button class="star" data-act="delfile" data-id="${i.id}" data-path="${esc(i.p)}" aria-label="حذف">🗑</button>`:"");
+const adminBox=()=>!sb?`<div class="empty">وضع العرض التجريبي.<br>اربط Supabase من ملف الإعداد لتفعيل الرفع.</div>`:admin?`<div class="add"><b>أنت مسجّل كمشرف</b><button class="dl" data-act="logout">تسجيل الخروج</button></div>`:`<div class="add"><b>دخول المشرف</b><input id="em" type="email" dir="ltr" placeholder="البريد"><input id="pw" type="password" dir="ltr" placeholder="كلمة المرور"><button class="dl" data-act="login">دخول</button>${msg?`<small>${esc(msg)}</small>`:""}</div>`;
+const esc=t=>String(t).replace(/[&<>"|]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","|":"&#124;"}[m]));
+let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
+const saveFav=()=>{try{localStorage.setItem("fav",JSON.stringify(fav))}catch(e){}};
+let S={sk:"theory",sg:"",v:"home",y:2,c:null,s:null,tab:"lec",q:"",from:"home"};
+const yr=()=>YEARS.find(x=>x.id==S.y);
+const subs=()=>{const a=[];YEARS.filter(y=>y.open).forEach(y=>Object.entries(y.courses).forEach(([c,ms])=>ms.forEach(m=>a.push({y:y.id,yn:y.name,c,m}))));return a};
+function go(p){S={...S,...p};render();window.scrollTo(0,0)}
+const bar=(t,b)=>`<div class="bar"><button class="back" data-go="${b}">رجوع</button><h2>${esc(t)}</h2></div>`;
+const subRow=a=>`<div class="row" style="padding:0"><button class="row" style="border:0" data-sub="${a.y}|${esc(a.c)}|${esc(a.m)}"><span><b>${esc(a.m)}</b><small>${esc(a.yn)} · ${esc(a.c)}</small></span></button><button class="star ${fav.includes(a.m)?"on":""}" data-fav="${esc(a.m)}" aria-label="مفضلة">${fav.includes(a.m)?"★":"☆"}</button>${admin&&sb?`<button class="star" data-act="delsub" data-name="${esc(a.m)}" aria-label="حذف المادة">🗑</button>`:""}</div>`;
+function render(){
+ const N=[["more","⋯","المزيد"],["fav","♡","المفضلة"],["home","⌂","الرئيسية"],["notif","🔔","الإشعارات"],["search","⌕","بحث"]];
+ const cur=["year","course","sub"].includes(S.v)?"home":S.v;
+ nav.innerHTML=N.map(([k,i,n])=>`<button class="${k==="home"?"home":""}" data-nav="${k}" ${cur===k?'aria-current="page"':""}><span>${i}</span>${n}</button>`).join("");
+ if(S.v==="home"){
+  const y=yr();
+  app.innerHTML=`<div class="top"><button class="ic p" aria-label="الملف الشخصي">👤</button><div class="mid"><b>تقنيات المختبرات الطبية</b><small>جامعة المعارف</small></div><button class="ic" data-nav="notif" aria-label="الإشعارات">🔔</button></div>
+  <div class="banner"><i>🔬</i><b>كل ما يخص دراستك في مكان واحد</b><span>محاضرات واختبارات وملخصات</span></div>
+  <div class="h"><b>اختر الكورس</b><div class="chips">${YEARS.map(x=>`<button class="chip" ${x.open||admin?"":"disabled"} aria-pressed="${x.id==S.y}" data-year="${x.id}">${x.name}</button>`).join("")}</div></div>
+  <div class="two">${Object.entries(y.courses).map(([c,m])=>`<button class="course" data-course="${esc(c)}"><div class="badge">📘</div><b>${esc(c)}</b><span>${m.length} مواد دراسية</span><div class="go">‹</div></button>`).join("")}</div>
+  <div class="h"><b>أقسام أخرى</b></div>
+  <div class="four"><button class="sec" data-nav="sched"><i>📅</i>الجداول</button><button class="sec" data-kd="exam"><i>📝</i>الاختبارات السابقة</button><button class="sec" data-kd="sum"><i>📄</i>الملخصات</button><button class="sec" data-nav="q"><i>💬</i>استفسارات الطلبة</button><button class="sec" data-nav="calc"><i>🧮</i>حاسبة المختبر</button><button class="sec" data-nav="notif"><i>📢</i>تبليغات الجامعة</button><button class="sec" data-nav="ref" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:10px"><i style="margin:0">🩸</i>القيم الطبيعية للفحوصات</button></div>`;
+ }
+ else if(S.v==="course"){app.innerHTML=bar(S.c+" · "+yr().name,"home")+addSubForm()+`<div class="list">${yr().courses[S.c].map(m=>subRow({y:S.y,yn:yr().name,c:S.c,m})).join("")}</div>`}
+ else if(S.v==="sub"){
+  const f=FILES[S.s]||{},l=f[S.tab]||[],T=[["lec","المحاضرات"],["exam","الاختبارات السابقة"],["sum","الملخصات"]];
+  app.innerHTML=bar(S.s,S.from)+`<div class="tabs" role="tablist">${T.map(([k,n])=>`<button class="tab" role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${n}</button>`).join("")}</div>`+(l.length?`<div class="list">${l.map(i=>`<div class="file"><b>${esc(i.t)}</b>${fb(i)}</div>`).join("")}</div>`:`<div class="empty">لا توجد ملفات هنا بعد.<br>سيتم رفعها قريبًا.</div>`)+upForm();mark();
+ }
+ else if(S.v==="fav"){const a=subs().filter(x=>fav.includes(x.m));app.innerHTML=bar("المفضلة","home")+(a.length?`<div class="list">${a.map(subRow).join("")}</div>`:`<div class="empty">ما أضفت مواد للمفضلة.<br>اضغط ☆ بجانب أي مادة.</div>`)}
+ else if(S.v==="notif"){app.innerHTML=bar("تبليغات الجامعة","home")+(ANN.length?"":`<div class="empty">لا توجد تبليغات حاليًا.</div>`)+`<div class="list">${ANN.map(a=>`<div class="file"><span><b>${esc(a.t)}</b><small style="color:var(--mute);display:block">${esc(a.d)}</small></span></div>`).join("")}</div>`}
+ else if(S.v==="search"){
+  const r=S.q?subs().filter(a=>a.m.includes(S.q)):[];
+  app.innerHTML=bar("بحث","home")+`<input class="search" id="q" placeholder="ابحث عن مادة…" value="${esc(S.q)}">`+(S.q?(r.length?`<div class="list">${r.map(subRow).join("")}</div>`:`<div class="empty">ما لقينا مادة بهذا الاسم.</div>`):"");
+  const q=document.getElementById("q");q.oninput=()=>{S.q=q.value;render();const n=document.getElementById("q");n.focus();n.setSelectionRange(n.value.length,n.value.length)};
+ }
+ else if(S.v==="sched"){
+  const rows=SCHED.filter(r=>r.year==S.y&&r.kind===S.sk),gs=[...new Set(rows.map(r=>r.grp))].sort(),g=gs.includes(S.sg)?S.sg:gs[0],list=rows.filter(r=>r.grp===g).sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||SLOTS.indexOf(a.time)-SLOTS.indexOf(b.time));
+  app.innerHTML=bar("جداول "+yr().name,"home")+`<div class="tabs">${[["theory","النظري"],["practical","العملي"]].map(([k,n])=>`<button class="tab" aria-selected="${S.sk===k}" data-sk="${k}">${n}</button>`).join("")}</div>`+(gs.length?`<div class="chips" style="margin-bottom:12px">${gs.map(x=>`<button class="chip" aria-pressed="${x===g}" data-sg="${esc(x)}">كروب ${esc(x)}</button>`).join("")}</div><div style="overflow-x:auto"><table class="tb"><tr><th>اليوم</th><th>الوقت</th><th>المادة</th><th>المكان</th>${admin?"<th></th>":""}</tr>${list.map((r,i)=>`<tr>${i&&list[i-1].day===r.day?"":`<td rowspan="${list.filter(x=>x.day===r.day).length}" style="font-weight:700;background:var(--soft)">${esc(r.day)}</td>`}<td>${esc(r.time)}</td><td>${esc(r.subj)}${r.lect?`<small style="display:block;color:var(--mute)">${esc(r.lect)}</small>`:""}</td><td>${esc(r.place||"")}</td>${admin?`<td>${r.id?`<button class="star" data-act="delrow" data-id="${r.id}" aria-label="حذف">🗑</button>`:""}</td>`:""}</tr>`).join("")}</table></div>`:`<div class="empty">لم يُضف جدول ${S.sk==="theory"?"النظري":"العملي"} بعد.</div>`)+schForm();
+ }
+ else if(S.v==="klist"){
+  const t={exam:"الاختبارات السابقة",sum:"الملخصات"}[S.kd],y=yr(),g=Object.values(y.courses).flat().map(m=>({m,l:(FILES[m]||{})[S.kd]||[]})).filter(x=>x.l.length);
+  app.innerHTML=bar(t+" · "+y.name,"home")+(g.length?g.map(x=>`<div class="sh" dir="auto">${esc(x.m)}</div><div class="list">${x.l.map(i=>`<div class="file"><b>${esc(i.t)}</b>${fb(i)}</div>`).join("")}</div>`).join(""):`<div class="empty">لا توجد ملفات هنا بعد.<br>ستُضاف قريبًا.</div>`);mark();
+ }
+ else if(S.v==="q"){
+  app.innerHTML=bar("استفسارات الطلبة","home")+(sb?`<div class="add"><input id="qn" placeholder="اسمك (اختياري)"><textarea id="qb" rows="3" placeholder="اكتب سؤالك…"></textarea><button class="dl" data-act="ask">إرسال السؤال</button></div>`+(QS.length?`<div class="list">${QS.map(q=>`<div class="file" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(q.name||"طالب")}</b><small style="color:var(--mute)">${new Date(q.created_at).toLocaleDateString("ar-IQ")}${admin?` <button class="star" style="font-size:16px" data-act="delq" data-id="${q.id}">🗑</button>`:""}</small></div><p style="margin:6px 0">${esc(q.body)}</p>${(q.replies||[]).sort((a,b)=>a.id-b.id).map(r=>`<div style="border-right:3px solid ${r.is_admin?"var(--acc)":"var(--line)"};padding:4px 10px;margin:6px 0;font-size:14px"><b>${esc(r.name||"طالب")}${r.is_admin?" ✓ المشرف":""}</b>: ${esc(r.body)}${admin?` <button class="star" style="font-size:16px" data-act="delr" data-id="${r.id}">🗑</button>`:""}</div>`).join("")}<div style="display:flex;gap:6px;margin-top:8px"><input class="search" style="margin:0" id="r${q.id}" placeholder="اكتب ردًا…"><button class="dl" data-act="reply" data-id="${q.id}">رد</button></div></div>`).join("")}</div>`:`<div class="empty">لا توجد أسئلة بعد. كن أول من يسأل!</div>`):`<div class="empty">يعمل بعد ربط الموقع بقاعدة البيانات.</div>`);
+ }
+ else if(S.v==="ai"){
+  app.innerHTML=bar("المساعد الذكي","home")+`<div class="empty" style="padding:12px;margin-bottom:12px;font-size:13px">مساعد للدراسة وقد يخطئ. راجع محاضراتك ولا تعتمد عليه بقرارات طبية، ولا تكتب فيه معلومات شخصية.</div>`+(sb?`<div class="list">${CH.map(m=>`<div class="file" style="display:block;${m.role==="user"?"background:var(--soft)":""}"><b>${m.role==="user"?"أنت":"المساعد"}</b><p dir="auto" style="margin:6px 0;white-space:pre-wrap">${esc(m.text)}</p></div>`).join("")}${busy?`<div class="empty">يفكر…</div>`:""}</div><div class="add"><textarea id="aq" rows="2" placeholder="اسأل عن أي موضوع بالمختبرات الطبية…"></textarea><button class="dl" data-act="askai">إرسال</button></div>`:`<div class="empty">يعمل بعد ربط الموقع بقاعدة البيانات.</div>`);
+ }
+ else if(S.v==="ref"){
+  const k=S.q.toLowerCase(),f=REF.filter(r=>!k||r.t.toLowerCase().includes(k)||r.g.toLowerCase().includes(k)),gs=[...new Set(f.map(r=>r.g))];
+  app.innerHTML=bar("القيم الطبيعية","home")+`<div class="empty" style="padding:12px;margin-bottom:12px;font-size:13px">قيم تقريبية للبالغين لأغراض الدراسة. تختلف حسب الجهاز والمختبر والعمر والجنس، فاعتمد مرجع مختبرك ومحاضراتك.</div><input class="search" id="rq" dir="ltr" placeholder="Search… (e.g. Hb)" value="${esc(S.q)}">`+(gs.length?gs.map(g=>`<div class="sh" dir="ltr">${esc(g)}</div><div style="overflow-x:auto"><table class="tb" dir="ltr"><tr><th>Test</th><th>Normal range</th><th>Unit</th></tr>${f.filter(r=>r.g===g).map(r=>`<tr><td style="text-align:left;font-weight:700">${esc(r.t)}</td><td>${esc(r.v)}</td><td>${esc(r.u)}</td></tr>`).join("")}</table></div>`).join(""):`<div class="empty">ما لقينا فحص بهذا الاسم.</div>`);
+  const rq=document.getElementById("rq");rq.oninput=()=>{S.q=rq.value;render();const n=document.getElementById("rq");n.focus();n.setSelectionRange(n.value.length,n.value.length)};
+ }
+ else if(S.v==="calc"){
+  const c=S.cc||"dil";
+  app.innerHTML=bar("حاسبة المختبر","home")+`<div class="chips" style="margin-bottom:12px">${Object.keys(CALCN).map(k=>`<button class="chip" aria-pressed="${k===c}" data-cc="${k}">${CALCN[k]}</button>`).join("")}</div><div class="add"><small style="color:var(--mute);line-height:1.7">${CALCH[c]}</small>`+(c==="conv"?`<select id="cs">${CONV.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join("")}</select><select id="cd"><option value="0">من الوحدة التقليدية إلى SI</option><option value="1">من SI إلى التقليدية</option></select>`:"")+CALCF[c].map(([id,l])=>`<label dir="auto" style="display:grid;gap:4px;font-size:13px">${l}<input id="${id}" type="number" inputmode="decimal" step="any" dir="ltr"></label>`).join("")+`</div><div class="empty" id="cr" dir="auto" style="line-height:2;font-size:17px;color:var(--ink)"></div>`;
+  calc();
+ }
+ else if(S.v==="more"){app.innerHTML=bar("المزيد","home")+`${adminBox()}`}
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+ if(d.nav){go({v:d.nav,q:""});if(d.nav==="q")loadQ()}
+ else if(d.year)go({y:d.year});
+ else if(d.course)go({v:"course",c:d.course});
+ else if(d.sub){const[y,c,m]=d.sub.split("|");go({v:"sub",y,c,s:m,tab:"lec",from:S.v==="course"?"course":S.v})}
+ else if(d.fav){fav=fav.includes(d.fav)?fav.filter(x=>x!==d.fav):[...fav,d.fav];saveFav();render()}
+ else if(d.tab){S.tab=d.tab;render()}
+ else if(d.go)go({v:d.go});
+ else if(d.act)act(d.act,d);
+ else if(d.sk){S.sk=d.sk;S.sg="";render()}
+ else if(d.sg){S.sg=d.sg;render()}
+ else if(d.kd)go({v:"klist",kd:d.kd});
+ else if(d.cc){S.cc=d.cc;render()}
+});
+render();init();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){})}
+</script>
+</body>
+</html>
