@@ -101,7 +101,7 @@ async function load(){
  try{
   const a=await sb.from("subjects").select("*").order("name"),b=await sb.from("files").select("*").order("created_at");
   if(a.error||b.error)throw 0;
-  ROWS=a.data;const c=await sb.from("schedule").select("*").order("id");SCHED=c.error?[]:c.data;
+  ROWS=a.data;const c=await sb.from("schedule").select("*").order("id");SCHED=c.error?[]:c.data;const n=await sb.from("announcements").select("*").order("created_at",{ascending:false}).limit(30);ANN.length=0;if(!n.error)n.data.forEach(x=>ANN.push({id:x.id,t:x.title,d:x.body||"",c:x.created_at}));
   YEARS.forEach(y=>{y.courses={};CN.forEach(c=>y.courses[c]=[])});
   a.data.forEach(r=>{const y=YEARS.find(x=>x.id==r.year);if(y&&y.courses[r.course])y.courses[r.course].push(r.name)});
   YEARS.forEach(y=>y.open=Object.values(y.courses).some(z=>z.length));
@@ -119,12 +119,11 @@ async function init(){
 async function act(k,d){
  const v=id=>(document.getElementById(id)||{}).value||"";
  try{
-  if(k==="open"){try{const c=await caches.open("maarif-files");let r=await c.match(d.url);if(!r){r=await fetch(d.url);if(!r.ok)throw 0;await c.put(d.url,r.clone())}
-   const b=await r.blob(),u=URL.createObjectURL(b),x=(d.url.split("?")[0].split(".").pop()||"pdf").slice(0,5),a=document.createElement("a");
-   a.href=u;a.download=(d.name||"file").replace(/[\\/:*?"<>|]/g,"_")+"."+x;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
-   catch(e){if(!window.open(d.url,"_blank"))location.href=d.url}}
+  if(k==="open"||k==="save"){const x=(d.url.split("?")[0].split(".").pop()||"").toLowerCase();if(k==="open"&&x==="pdf"){go({v:"pdf",pn:d.name,pu:d.url,pf:S.v});return}await dlFile(d.url,d.name,x||"pdf")}
   else if(k==="login"){const r=await sb.auth.signInWithPassword({email:v("em"),password:v("pw")});msg=r.error?"بيانات الدخول غير صحيحة":"";render()}
   else if(k==="logout"){await sb.auth.signOut()}
+  else if(k==="addann"){const t=v("at").trim();if(!t){alert("اكتب عنوان التبليغ");return}const r=await sb.from("announcements").insert({title:t,body:v("ab").trim()||null});if(r.error)throw r.error;await load()}
+  else if(k==="delann"){if(!confirm("حذف التبليغ؟"))return;await sb.from("announcements").delete().eq("id",d.id);await load()}
   else if(k==="ask"){const b=v("qb").trim();if(b.length<3){alert("اكتب سؤالك أولًا");return}const r=await sb.from("inquiries").insert({name:v("qn").trim()||null,body:b});if(r.error)throw r.error;await loadQ()}
   else if(k==="reply"){const b=v("r"+d.id).trim();if(!b)return;const r=await sb.from("replies").insert({inquiry_id:+d.id,name:v("qn").trim()||null,body:b,is_admin:admin});if(r.error)throw r.error;await loadQ()}
   else if(k==="delq"||k==="delr"){if(!confirm("حذف؟"))return;await sb.from(k==="delq"?"inquiries":"replies").delete().eq("id",d.id);await loadQ()}
@@ -190,11 +189,35 @@ function calc(){
 }
 document.addEventListener("input",calc);
 const credit=()=>`<p class="note">تصميم وتطوير: <b>أنس جاسم</b><br><a href="https://t.me/uuxuq" target="_blank" rel="noopener">تلغرام @uuxuq</a></p>`;
+const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";let PDFJS=null;
+async function loadPdfLib(){if(PDFJS)return PDFJS;
+ await new Promise((ok,no)=>{const e=document.createElement("script");e.src=PJ+"pdf.min.js";e.onload=ok;e.onerror=no;document.head.appendChild(e)});
+ const wt=await(await fetch(PJ+"pdf.worker.min.js")).text();
+ window.pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([wt],{type:"text/javascript"}));return PDFJS=window.pdfjsLib}
+async function dlFile(u,n,x){try{const c=await caches.open("maarif-files");let r=await c.match(u);if(!r){r=await fetch(u);if(!r.ok)throw 0;await c.put(u,r.clone())}
+ const b=await r.blob(),o=URL.createObjectURL(b),a=document.createElement("a");a.href=o;a.download=(n||"file").replace(/[\\/:*?"<>|]/g,"_")+"."+x;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(o),60000)}catch(e){if(!window.open(u,"_blank"))location.href=u}}
+async function showPdf(u){
+ const st=document.getElementById("pst"),pv=document.getElementById("pv");
+ try{
+  const c=await caches.open("maarif-files");let r=await c.match(u);
+  if(!r){r=await fetch(u);if(!r.ok)throw 0;await c.put(u,r.clone())}
+  const ab=await r.arrayBuffer(),lib=await loadPdfLib(),doc=await lib.getDocument({data:ab}).promise;
+  if(S.v!=="pdf"||S.pu!==u)return;
+  st.remove();
+  const w=pv.clientWidth,dpr=Math.min(window.devicePixelRatio||1,1.5),p1=await doc.getPage(1),b1=p1.getViewport({scale:1});
+  const io=new IntersectionObserver(es=>es.forEach(async e=>{if(!e.isIntersecting)return;const cv=e.target;io.unobserve(cv);
+   const pg=await doc.getPage(+cv.dataset.n),b=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w*dpr/b.width});
+   cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}),{rootMargin:"800px"});
+  for(let n=1;n<=doc.numPages;n++){const cv=document.createElement("canvas");cv.dataset.n=n;cv.style.cssText="width:100%;background:#fff;border-radius:8px;aspect-ratio:"+b1.width+"/"+b1.height;pv.appendChild(cv);io.observe(cv)}
+ }catch(e){if(st)st.textContent="تعذر فتح الملف. أول مرة تحتاج اتصال بالإنترنت."}
+ mark();
+}
+const annForm=()=>admin?`<div class="add"><b>إضافة تبليغ</b><input id="at" placeholder="عنوان التبليغ"><textarea id="ab" rows="3" placeholder="التفاصيل (اختياري)"></textarea><button class="dl" data-act="addann">نشر</button></div>`:"";
 const TN={lec:"المحاضرات النظرية",prac:"المحاضرات العملية",exam:"الاختبارات السابقة",sum:"الملخصات"};
 const schForm=()=>admin?`<div class="add"><b>إضافة سطر إلى جدول ${S.sk==="theory"?"النظري":"العملي"}</b><input id="gp" placeholder="الكروب (مثال: A)"><select id="dy">${DAYS.map(x=>`<option>${x}</option>`).join("")}</select><input id="tm" placeholder="الوقت (مثال: 9:00 – 12:00)"><input id="sj" placeholder="المادة"><input id="pl" placeholder="القاعة أو المختبر"><input id="lc" placeholder="المدرّس (اختياري)"><button class="dl" data-act="addrow">إضافة</button></div>`:"";
 const addSubForm=()=>admin?`<div class="add"><input id="sn" placeholder="اسم المادة الجديدة"><button class="dl" data-act="addsub">إضافة مادة</button></div>`:"";
 const upForm=()=>admin?`<div class="add"><b>رفع ملف إلى ${TN[S.tab]}</b><input id="ft" placeholder="اسم الملف (مثال: المحاضرة 3)"><input id="fl" type="file"><button class="dl" data-act="upload">رفع</button></div>`:"";
-const fb=i=>(i.u&&i.u!=="#"?`<button class="dl" data-act="open" data-name="${esc(i.t)}" data-url="${esc(i.u)}">تحميل</button>`:`<button class="dl">تحميل</button>`)+(admin&&i.id?`<button class="star" data-act="delfile" data-id="${i.id}" data-path="${esc(i.p)}" aria-label="حذف">🗑</button>`:"");
+const fb=i=>(i.u&&i.u!=="#"?`<button class="dl" data-act="open" data-name="${esc(i.t)}" data-url="${esc(i.u)}">فتح</button>`:`<button class="dl">تحميل</button>`)+(admin&&i.id?`<button class="star" data-act="delfile" data-id="${i.id}" data-path="${esc(i.p)}" aria-label="حذف">🗑</button>`:"");
 const adminBox=()=>!sb?`<div class="empty">وضع العرض التجريبي.<br>اربط Supabase من ملف الإعداد لتفعيل الرفع.</div>`:admin?`<div class="add"><b>أنت مسجّل كمشرف</b><button class="dl" data-act="logout">تسجيل الخروج</button></div>`:`<div class="add"><b>دخول المشرف</b><input id="em" type="email" dir="ltr" placeholder="البريد"><input id="pw" type="password" dir="ltr" placeholder="كلمة المرور"><button class="dl" data-act="login">دخول</button>${msg?`<small>${esc(msg)}</small>`:""}</div>`;
 const esc=t=>String(t).replace(/[&<>"|]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","|":"&#124;"}[m]));
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
@@ -224,7 +247,9 @@ function render(){
   app.innerHTML=bar(S.s,S.from)+`<div class="tabs" role="tablist">${T.map(([k,n])=>`<button class="tab" role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${n}</button>`).join("")}</div>`+(l.length?`<div class="list">${l.map(i=>`<div class="file"><b>${esc(i.t)}</b>${fb(i)}</div>`).join("")}</div>`:`<div class="empty">لا توجد ملفات هنا بعد.<br>سيتم رفعها قريبًا.</div>`)+upForm();mark();
  }
  else if(S.v==="fav"){const a=subs().filter(x=>fav.includes(x.m));app.innerHTML=bar("المفضلة","home")+(a.length?`<div class="list">${a.map(subRow).join("")}</div>`:`<div class="empty">ما أضفت مواد للمفضلة.<br>اضغط ☆ بجانب أي مادة.</div>`)}
- else if(S.v==="notif"){app.innerHTML=bar("تبليغات الجامعة","home")+(ANN.length?"":`<div class="empty">لا توجد تبليغات حاليًا.</div>`)+`<div class="list">${ANN.map(a=>`<div class="file"><span><b>${esc(a.t)}</b><small style="color:var(--mute);display:block">${esc(a.d)}</small></span></div>`).join("")}</div>`}
+ else if(S.v==="notif"){
+  app.innerHTML=bar("تبليغات الجامعة","home")+annForm()+(ANN.length?`<div class="list">${ANN.map(a=>`<div class="file" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(a.t)}</b><small style="color:var(--mute)">${a.c?new Date(a.c).toLocaleDateString("ar-IQ"):""}${admin&&a.id?` <button class="star" style="font-size:16px" data-act="delann" data-id="${a.id}">🗑</button>`:""}</small></div>${a.d?`<p style="margin:6px 0;white-space:pre-wrap">${esc(a.d)}</p>`:""}</div>`).join("")}</div>`:`<div class="empty">لا توجد تبليغات حاليًا.</div>`);
+ }
  else if(S.v==="search"){
   const r=S.q?subs().filter(a=>a.m.includes(S.q)):[];
   app.innerHTML=bar("بحث","home")+`<input class="search" id="q" placeholder="ابحث عن مادة…" value="${esc(S.q)}">`+(S.q?(r.length?`<div class="list">${r.map(subRow).join("")}</div>`:`<div class="empty">ما لقينا مادة بهذا الاسم.</div>`):"");
@@ -253,6 +278,10 @@ function render(){
   const c=S.cc||"dil";
   app.innerHTML=bar("حاسبة المختبر","home")+`<div class="chips" style="margin-bottom:12px">${Object.keys(CALCN).map(k=>`<button class="chip" aria-pressed="${k===c}" data-cc="${k}">${CALCN[k]}</button>`).join("")}</div><div class="add"><small style="color:var(--mute);line-height:1.7">${CALCH[c]}</small>`+(c==="conv"?`<select id="cs">${CONV.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join("")}</select><select id="cd"><option value="0">من الوحدة التقليدية إلى SI</option><option value="1">من SI إلى التقليدية</option></select>`:"")+CALCF[c].map(([id,l])=>`<label dir="auto" style="display:grid;gap:4px;font-size:13px">${l}<input id="${id}" type="number" inputmode="decimal" step="any" dir="ltr"></label>`).join("")+`</div><div class="empty" id="cr" dir="auto" style="line-height:2;font-size:17px;color:var(--ink)"></div>`;
   calc();
+ }
+ else if(S.v==="pdf"){
+  app.innerHTML=bar(S.pn,S.pf||"sub")+`<div class="add" id="pst" style="text-align:center">جاري تجهيز الملف…</div><div id="pv" style="display:grid;gap:10px"></div><div class="add"><button class="dl" data-act="save" data-url="${esc(S.pu)}" data-name="${esc(S.pn)}">حفظ نسخة بالجهاز</button></div>`;
+  showPdf(S.pu);
  }
  else if(S.v==="more"){app.innerHTML=bar("المزيد","home")+`${adminBox()}${credit()}`}
 }
