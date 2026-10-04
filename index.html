@@ -119,7 +119,10 @@ async function init(){
 async function act(k,d){
  const v=id=>(document.getElementById(id)||{}).value||"";
  try{
-  if(k==="open"){const w=window.open("","_blank");try{const c=await caches.open("maarif-files");let r=await c.match(d.url);if(!r){r=await fetch(d.url);if(!r.ok)throw 0;await c.put(d.url,r.clone())}const b=await r.blob(),u=URL.createObjectURL(b);if(w)w.location=u;else location.href=u;mark()}catch(e){if(w)w.location=d.url;else location.href=d.url}}
+  if(k==="open"){try{const c=await caches.open("maarif-files");let r=await c.match(d.url);if(!r){r=await fetch(d.url);if(!r.ok)throw 0;await c.put(d.url,r.clone())}
+   const b=await r.blob(),u=URL.createObjectURL(b),x=(d.url.split("?")[0].split(".").pop()||"pdf").slice(0,5),a=document.createElement("a");
+   a.href=u;a.download=(d.name||"file").replace(/[\\/:*?"<>|]/g,"_")+"."+x;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
+   catch(e){if(!window.open(d.url,"_blank"))location.href=d.url}}
   else if(k==="login"){const r=await sb.auth.signInWithPassword({email:v("em"),password:v("pw")});msg=r.error?"بيانات الدخول غير صحيحة":"";render()}
   else if(k==="logout"){await sb.auth.signOut()}
   else if(k==="ask"){const b=v("qb").trim();if(b.length<3){alert("اكتب سؤالك أولًا");return}const r=await sb.from("inquiries").insert({name:v("qn").trim()||null,body:b});if(r.error)throw r.error;await loadQ()}
@@ -191,7 +194,7 @@ const TN={lec:"المحاضرات النظرية",prac:"المحاضرات ال�
 const schForm=()=>admin?`<div class="add"><b>إضافة سطر إلى جدول ${S.sk==="theory"?"النظري":"العملي"}</b><input id="gp" placeholder="الكروب (مثال: A)"><select id="dy">${DAYS.map(x=>`<option>${x}</option>`).join("")}</select><input id="tm" placeholder="الوقت (مثال: 9:00 – 12:00)"><input id="sj" placeholder="المادة"><input id="pl" placeholder="القاعة أو المختبر"><input id="lc" placeholder="المدرّس (اختياري)"><button class="dl" data-act="addrow">إضافة</button></div>`:"";
 const addSubForm=()=>admin?`<div class="add"><input id="sn" placeholder="اسم المادة الجديدة"><button class="dl" data-act="addsub">إضافة مادة</button></div>`:"";
 const upForm=()=>admin?`<div class="add"><b>رفع ملف إلى ${TN[S.tab]}</b><input id="ft" placeholder="اسم الملف (مثال: المحاضرة 3)"><input id="fl" type="file"><button class="dl" data-act="upload">رفع</button></div>`:"";
-const fb=i=>(i.u&&i.u!=="#"?`<button class="dl" data-act="open" data-url="${esc(i.u)}">تحميل</button>`:`<button class="dl">تحميل</button>`)+(admin&&i.id?`<button class="star" data-act="delfile" data-id="${i.id}" data-path="${esc(i.p)}" aria-label="حذف">🗑</button>`:"");
+const fb=i=>(i.u&&i.u!=="#"?`<button class="dl" data-act="open" data-name="${esc(i.t)}" data-url="${esc(i.u)}">تحميل</button>`:`<button class="dl">تحميل</button>`)+(admin&&i.id?`<button class="star" data-act="delfile" data-id="${i.id}" data-path="${esc(i.p)}" aria-label="حذف">🗑</button>`:"");
 const adminBox=()=>!sb?`<div class="empty">وضع العرض التجريبي.<br>اربط Supabase من ملف الإعداد لتفعيل الرفع.</div>`:admin?`<div class="add"><b>أنت مسجّل كمشرف</b><button class="dl" data-act="logout">تسجيل الخروج</button></div>`:`<div class="add"><b>دخول المشرف</b><input id="em" type="email" dir="ltr" placeholder="البريد"><input id="pw" type="password" dir="ltr" placeholder="كلمة المرور"><button class="dl" data-act="login">دخول</button>${msg?`<small>${esc(msg)}</small>`:""}</div>`;
 const esc=t=>String(t).replace(/[&<>"|]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","|":"&#124;"}[m]));
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
@@ -262,7 +265,7 @@ document.addEventListener("click",e=>{
  else if(d.fav){fav=fav.includes(d.fav)?fav.filter(x=>x!==d.fav):[...fav,d.fav];saveFav();render()}
  else if(d.tab){S.tab=d.tab;render()}
  else if(d.go)go({v:d.go});
- else if(d.act)act(d.act,d);
+ else if(d.act){const t=b.textContent;b.disabled=true;b.textContent=d.act==="upload"?"جاري الرفع…":"جاري المعالجة…";Promise.resolve(act(d.act,d)).finally(()=>{if(b.isConnected){b.disabled=false;b.textContent=t}mark()})}
  else if(d.sk){S.sk=d.sk;S.sg="";render()}
  else if(d.sg){S.sg=d.sg;render()}
  else if(d.kd)go({v:"klist",kd:d.kd});
